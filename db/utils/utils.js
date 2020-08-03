@@ -9,11 +9,13 @@ exports.formatDates = (list) => {
   return formattedList;
 };
 
-exports.makeRefObj = (list, key, value) => {
-  const listRefKey = list[0][key];
-  const listRefValue = list[0][value];
+exports.makeRefObj = (list, key = "title", value = "article_id") => {
   const listRef = {};
-  listRef[listRefKey] = listRefValue;
+  list.forEach((listItem) => {
+    const listRefKey = listItem[key];
+    const listRefValue = listItem[value];
+    listRef[listRefKey] = listRefValue;
+  });
   return listRef;
 };
 

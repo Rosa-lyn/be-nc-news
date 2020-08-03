@@ -194,6 +194,53 @@ describe("makeRefObj", () => {
     const expected = { "title-a": 1 };
     expect(testListRef).toEqual(expected);
   });
+  test("creates a reference object when there is more than one object in the array", () => {
+    const testList = [
+      { article_id: 1, title: "title-a" },
+      { article_id: 2, title: "title-b" },
+      { article_id: 3, title: "title-c" },
+    ];
+    const testListRef = makeRefObj(testList, "title", "article_id");
+    const expected = { "title-a": 1, "title-b": 2, "title-c": 3 };
+    expect(testListRef).toEqual(expected);
+  });
+  test("doesn't mutate the original data", () => {
+    const testList = [
+      { article_id: 1, title: "title-a" },
+      { article_id: 2, title: "title-b" },
+      { article_id: 3, title: "title-c" },
+    ];
+    makeRefObj(testList, "title", "article_id");
+    const controlList = [
+      { article_id: 1, title: "title-a" },
+      { article_id: 2, title: "title-b" },
+      { article_id: 3, title: "title-c" },
+    ];
+    expect(testList).toEqual(controlList);
+  });
+  test("title and article_id are set as default values for the key and value parameters if not provided", () => {
+    let testList = [
+      { article_id: 1, title: "title-a" },
+      { article_id: 2, title: "title-b" },
+      { article_id: 3, title: "title-c" },
+    ];
+    let testListRef = makeRefObj(testList);
+    let expected = { "title-a": 1, "title-b": 2, "title-c": 3 };
+    expect(testListRef).toEqual(expected);
+
+    testList = [
+      { username: "grumpy19", name: "Paul Grump" },
+      { username: "happyamy2016", name: "Amy Happy" },
+      { username: "cooljmessy", name: "Peter Messy" },
+    ];
+    testListRef = makeRefObj(testList, "username", "name");
+    expected = {
+      grumpy19: "Paul Grump",
+      happyamy2016: "Amy Happy",
+      cooljmessy: "Peter Messy",
+    };
+    expect(testListRef).toEqual(expected);
+  });
 });
 
 describe("formatComments", () => {});
