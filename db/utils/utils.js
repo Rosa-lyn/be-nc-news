@@ -1,5 +1,20 @@
-exports.formatDates = list => {};
+/*
+formatDates()
+This utility function should be able to take an array (list) of objects and return a new array. Each item in the new array must have its timestamp converted into a Javascript date object. Everything else in each item must be maintained.
 
-exports.makeRefObj = list => {};
+hint: Think carefully about how you can test that this has worked - it's not by copying and pasting a sql timestamp from the terminal into your test
+*/
+
+exports.formatDates = (list) => {
+  const formattedList = [];
+  if (list.length === 0) return formattedList;
+  const date = list[0].created_at;
+  const { ...listCopy } = list[0];
+  listCopy.created_at = new Date(date);
+  formattedList.push(listCopy);
+  return formattedList;
+};
+
+exports.makeRefObj = (list) => {};
 
 exports.formatComments = (comments, articleRef) => {};
