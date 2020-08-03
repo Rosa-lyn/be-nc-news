@@ -19,4 +19,12 @@ exports.makeRefObj = (list, key = "title", value = "article_id") => {
   return listRef;
 };
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => {
+  const formattedComments = [];
+  if (comments.length === 0) return formattedComments;
+  const author = comments[0].created_by;
+  const { created_by, ...commentsCopy } = comments[0];
+  commentsCopy.author = author;
+  formattedComments.push(commentsCopy);
+  return formattedComments;
+};
