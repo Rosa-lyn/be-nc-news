@@ -4,37 +4,6 @@ const {
   formatComments,
 } = require("../db/utils/utils");
 
-/*
-comments:
-[
-  {
-    body: "Oh, I've got compassion ...",
-    belongs_to: articles.title,
-    created_by: users.username,
-    votes: 16,
-    created_at: 1511354163389,
-  },
-  {},
-  ...
-]
-should be --->
-comments:
-[
-  {
-    body: "Oh, I've got compassion ...",
-
-    ** article_id: articles.article_id
-    ** author: users.username, **
-
-    votes: 16,
-    created_at: 1511354163389,
-  },
-  {},
-  ...
-]
-
-create ref needs to match articles.article_title to articles.article_id
-*/
 describe("formatDates", () => {
   test("returns a new empty array when passed an empty array", () => {
     const testList = [];
