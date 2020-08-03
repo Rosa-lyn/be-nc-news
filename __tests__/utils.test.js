@@ -271,18 +271,212 @@ describe("formatComments", () => {
       "article B": 2,
       "article C": 3,
     };
-
     const formattedComments = formatComments(comments, articleRef);
     expect(formattedComments[0].author).toBe("butter_bridge");
     expect(formattedComments[0]).not.toHaveProperty("created_by");
   });
+  test("changes 'created_by' property to 'author' when passed an array of multiple comments", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body: "body 2",
+        belongs_to: "article B",
+        created_by: "grumpy19",
+        votes: 25,
+        created_at: 1416140514171,
+      },
+      {
+        body: "body 3",
+        belongs_to: "article C",
+        created_by: "cooljmessy",
+        votes: 755,
+        created_at: 1289996514171,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    const formattedComments = formatComments(comments, articleRef);
+    expect(formattedComments.length).toBe(3);
+    formattedComments.forEach((comment) => {
+      expect(comment).toHaveProperty("author");
+    });
+  });
+
+  test("removes 'belongs_to' property and adds 'article_id' with the corresponding id from the articleRef object, for an array of one comment", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    const formattedComments = formatComments(comments, articleRef);
+    expect(formattedComments[0].article_id).toBe(1);
+    expect(formattedComments[0]).not.toHaveProperty("belongs_to");
+  });
+  test("removes 'belongs_to' property and adds 'article_id' with the corresponding id from the articleRef object, for an array of multiple comments", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body: "body 2",
+        belongs_to: "article B",
+        created_by: "grumpy19",
+        votes: 25,
+        created_at: 1416140514171,
+      },
+      {
+        body: "body 3",
+        belongs_to: "article C",
+        created_by: "cooljmessy",
+        votes: 755,
+        created_at: 1289996514171,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    const formattedComments = formatComments(comments, articleRef);
+    formattedComments.forEach((comment) => {
+      expect(comment).not.toHaveProperty("belongs_to");
+      expect(comment).toHaveProperty("article_id");
+    });
+  });
+  test("converts 'created_at' value into a javascript date object for an array of one comment", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    const formattedComments = formatComments(comments, articleRef);
+    expect(formattedComments[0].created_at).toEqual(new Date(1511354163389));
+  });
+  test("converts 'created_at' value into a javascript date object for an array of multiple comments", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body: "body 2",
+        belongs_to: "article B",
+        created_by: "grumpy19",
+        votes: 25,
+        created_at: 1416140514171,
+      },
+      {
+        body: "body 3",
+        belongs_to: "article C",
+        created_by: "cooljmessy",
+        votes: 755,
+        created_at: 1289996514171,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    const formattedComments = formatComments(comments, articleRef);
+    formattedComments.forEach((comment) => {
+      const date = comment.created_at;
+      expect(comment.created_at).toEqual(new Date(date));
+    });
+  });
+  test("doesn't mutate original data", () => {
+    const comments = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body: "body 2",
+        belongs_to: "article B",
+        created_by: "grumpy19",
+        votes: 25,
+        created_at: 1416140514171,
+      },
+      {
+        body: "body 3",
+        belongs_to: "article C",
+        created_by: "cooljmessy",
+        votes: 755,
+        created_at: 1289996514171,
+      },
+    ];
+    const articleRef = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    formatComments(comments, articleRef);
+    const commentsControl = [
+      {
+        body: "body 1",
+        belongs_to: "article A",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body: "body 2",
+        belongs_to: "article B",
+        created_by: "grumpy19",
+        votes: 25,
+        created_at: 1416140514171,
+      },
+      {
+        body: "body 3",
+        belongs_to: "article C",
+        created_by: "cooljmessy",
+        votes: 755,
+        created_at: 1289996514171,
+      },
+    ];
+    const articleRefControl = {
+      "article A": 1,
+      "article B": 2,
+      "article C": 3,
+    };
+    expect(comments).toEqual(commentsControl);
+    expect(articleRef).toEqual(articleRefControl);
+  });
 });
-
-/* 
-
-      Your comment data is currently in the incorrect format and will violate your SQL schema. 
-
-      Keys need renaming, values need changing, and most annoyingly, your comments currently only refer to the title of the article they belong to, not the id. 
-      
-      You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
-      */

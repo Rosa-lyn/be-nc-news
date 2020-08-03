@@ -20,11 +20,20 @@ exports.makeRefObj = (list, key = "title", value = "article_id") => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  const formattedComments = [];
-  if (comments.length === 0) return formattedComments;
-  const author = comments[0].created_by;
-  const { created_by, ...commentsCopy } = comments[0];
-  commentsCopy.author = author;
-  formattedComments.push(commentsCopy);
+  const formattedComments = comments.map((comment) => {
+    const author = comment.created_by;
+    const belongsTo = comment.belongs_to;
+    const articleId = articleRef[belongsTo];
+    const date = new Date(comment.created_at);
+
+    const { belongs_to, created_by, ...commentsCopy } = comment;
+
+    commentsCopy.author = author;
+    commentsCopy.article_id = articleId;
+    commentsCopy.created_at = date;
+
+    return commentsCopy;
+  });
+
   return formattedComments;
 };
