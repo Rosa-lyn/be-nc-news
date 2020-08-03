@@ -18,6 +18,10 @@ exports.seed = function (knex) {
       return Promise.all([topicsInsertions, usersInsertions]);
     })
     .then(() => {
+      // console.log(articleData);
+      const formattedArticles = formatDates(articleData);
+      console.log("seeding articles table...");
+      return knex("articles").insert(formattedArticles).returning("*");
       /* 
       
       Your article data is currently in the incorrect format and will violate your SQL schema. 
@@ -28,6 +32,7 @@ exports.seed = function (knex) {
       */
     })
     .then((articleRows) => {
+      console.log(articleRows);
       /* 
 
       Your comment data is currently in the incorrect format and will violate your SQL schema. 
