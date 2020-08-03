@@ -92,6 +92,62 @@ describe("formatDates", () => {
     ];
     expect(formattedList).toEqual(expected);
   });
+  test("does not mutate the original input data", () => {
+    const testList = [
+      {
+        title: "title-a",
+        topic: "topic-b",
+        author: "author-f",
+        body: "body-a",
+        created_at: 1542284514171,
+        votes: 100,
+      },
+      {
+        title: "title-b",
+        topic: "topic-f",
+        author: "author-e",
+        body: "body-b",
+        created_at: 1416140514171,
+        votes: 4,
+      },
+      {
+        title: "title-c",
+        topic: "topic-a",
+        author: "author-a",
+        body: "body-c",
+        created_at: 1289996514171,
+        votes: 76,
+      },
+    ];
+    formatDates(testList);
+    const controlList = [
+      {
+        title: "title-a",
+        topic: "topic-b",
+        author: "author-f",
+        body: "body-a",
+        created_at: 1542284514171,
+        votes: 100,
+      },
+      {
+        title: "title-b",
+        topic: "topic-f",
+        author: "author-e",
+        body: "body-b",
+        created_at: 1416140514171,
+        votes: 4,
+      },
+      {
+        title: "title-c",
+        topic: "topic-a",
+        author: "author-a",
+        body: "body-c",
+        created_at: 1289996514171,
+        votes: 76,
+      },
+    ];
+    expect(testList).toEqual(controlList);
+  });
 });
 
 describe("makeRefObj", () => {});
