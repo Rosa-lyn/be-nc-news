@@ -6,12 +6,13 @@ hint: Think carefully about how you can test that this has worked - it's not by 
 */
 
 exports.formatDates = (list) => {
-  const formattedList = [];
-  if (list.length === 0) return formattedList;
-  const date = list[0].created_at;
-  const { ...listCopy } = list[0];
-  listCopy.created_at = new Date(date);
-  formattedList.push(listCopy);
+  const formattedList = list.map((listItem) => {
+    const date = listItem.created_at;
+    const { ...listCopy } = listItem;
+    listCopy.created_at = new Date(date);
+    return listCopy;
+  });
+
   return formattedList;
 };
 

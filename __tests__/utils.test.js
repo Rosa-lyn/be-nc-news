@@ -4,27 +4,6 @@ const {
   formatComments,
 } = require("../db/utils/utils");
 
-/*
-[
-  {
-    title: 'Living in the shadow of a great man',
-    topic: 'mitch',
-    author: 'butter_bridge',
-    body: 'I find this existence challenging',
-    created_at: 1542284514171,
-    votes: 100,
-  },
-  {
-    title: 'Sony Vaio; or, The Laptop',
-    topic: 'mitch',
-    author: 'icellusedkars',
-    body:
-      'Call me Mitchell. ...',
-    created_at: 1416140514171,
-  }
-]
-
-*/
 describe("formatDates", () => {
   test("returns a new empty array when passed an empty array", () => {
     const testList = [];
@@ -53,6 +32,62 @@ describe("formatDates", () => {
         body: "body-c",
         created_at: new Date(1542284514171),
         votes: 100,
+      },
+    ];
+    expect(formattedList).toEqual(expected);
+  });
+  test("returns a formatted array when passed an array of multiple objects", () => {
+    const testList = [
+      {
+        title: "title-a",
+        topic: "topic-b",
+        author: "author-f",
+        body: "body-a",
+        created_at: 1542284514171,
+        votes: 100,
+      },
+      {
+        title: "title-b",
+        topic: "topic-f",
+        author: "author-e",
+        body: "body-b",
+        created_at: 1416140514171,
+        votes: 4,
+      },
+      {
+        title: "title-c",
+        topic: "topic-a",
+        author: "author-a",
+        body: "body-c",
+        created_at: 1289996514171,
+        votes: 76,
+      },
+    ];
+    const formattedList = formatDates(testList);
+    const expected = [
+      {
+        title: "title-a",
+        topic: "topic-b",
+        author: "author-f",
+        body: "body-a",
+        created_at: new Date(1542284514171),
+        votes: 100,
+      },
+      {
+        title: "title-b",
+        topic: "topic-f",
+        author: "author-e",
+        body: "body-b",
+        created_at: new Date(1416140514171),
+        votes: 4,
+      },
+      {
+        title: "title-c",
+        topic: "topic-a",
+        author: "author-a",
+        body: "body-c",
+        created_at: new Date(1289996514171),
+        votes: 76,
       },
     ];
     expect(formattedList).toEqual(expected);
