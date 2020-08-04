@@ -63,7 +63,7 @@ describe("app", () => {
     });
     describe("/articles", () => {
       describe("/:article_id", () => {
-        test.only("GET 200: responds with an article object with necessary properties", () => {
+        test("GET 200: responds with an article object with necessary properties", () => {
           return request(app)
             .get("/api/articles/1")
             .expect(200)
@@ -81,6 +81,14 @@ describe("app", () => {
                   // comment_count: expect.any(Number),
                 })
               );
+            });
+        });
+        test("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+          return request(app)
+            .get("/api/articles/Moustache")
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Invalid article id");
             });
         });
       });
