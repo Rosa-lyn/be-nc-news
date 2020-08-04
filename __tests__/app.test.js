@@ -7,6 +7,16 @@ const connection = require("../db/connection");
 beforeEach(() => connection.seed.run());
 describe("app", () => {
   afterAll(() => connection.destroy());
+  describe("invalid paths", () => {
+    test("ALL 404: responds with 'path not found' for non-existent paths", () => {
+      return request(app)
+        .get("/jpg/topics")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("Path not found :(");
+        });
+    });
+  });
   describe("/api", () => {
     describe("/topics", () => {
       test("GET 200: responds with an array of topic objects with necessary keys", () => {
