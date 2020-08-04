@@ -87,7 +87,15 @@ describe("app", () => {
             .get("/api/articles/Moustache")
             .expect(400)
             .then((res) => {
-              expect(res.body.msg).toEqual("Invalid article id: Moustache");
+              expect(res.body.msg).toEqual("Invalid article id: Moustache :(");
+            });
+        });
+        test("GET 404: responds with 'article not found' when given an article id that doesn't exist", () => {
+          return request(app)
+            .get("/api/articles/4000000")
+            .expect(404)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Article: 4000000 not found :(");
             });
         });
       });
