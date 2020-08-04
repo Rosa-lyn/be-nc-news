@@ -10,6 +10,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid article id" });
+    const id = req.url.substring(14);
+    res.status(400).send({ msg: `Invalid article id: ${id}` });
   } else console.log(err);
 };

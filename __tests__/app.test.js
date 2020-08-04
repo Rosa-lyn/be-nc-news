@@ -83,12 +83,12 @@ describe("app", () => {
               );
             });
         });
-        test("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+        test.only("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
           return request(app)
             .get("/api/articles/Moustache")
             .expect(400)
             .then((res) => {
-              expect(res.body.msg).toEqual("Invalid article id");
+              expect(res.body.msg).toEqual("Invalid article id: Moustache");
             });
         });
       });
