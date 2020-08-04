@@ -18,15 +18,14 @@ exports.seed = function (knex) {
       return Promise.all([topicsInsertions, usersInsertions]);
     })
     .then(() => {
-      // console.log(articleData);
       const formattedArticles = formatDates(articleData);
       console.log("seeding articles table...");
       return knex("articles").insert(formattedArticles).returning("*");
     })
     .then((articleRows) => {
       const articleRef = makeRefObj(articleRows);
-      console.log(articleRef);
       const formattedComments = formatComments(commentData, articleRef);
+      console.log("seeding comments table...");
       return knex("comments").insert(formattedComments);
     });
 };
