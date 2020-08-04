@@ -19,7 +19,7 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("/topics", () => {
-      test("GET 200: responds with an array of topic objects with necessary keys", () => {
+      test("GET 200: responds with an array of topic objects with necessary properties", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
@@ -33,6 +33,24 @@ describe("app", () => {
               ])
             );
           });
+      });
+    });
+    describe("/users", () => {
+      describe("/:username", () => {
+        test("GET 200: responds with a user object with necessary properties", () => {
+          return request(app)
+            .get("/api/users/butter_bridge")
+            .expect(200)
+            .then((res) => {
+              expect(res.body.user).toEqual(
+                expect.objectContaining({
+                  username: expect.any(String),
+                  avatar_url: expect.any(String),
+                  name: expect.any(String),
+                })
+              );
+            });
+        });
       });
     });
   });
