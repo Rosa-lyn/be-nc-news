@@ -51,6 +51,38 @@ describe("app", () => {
               );
             });
         });
+        test("GET 404: responds with 'user not found' when given a username that doesn't exist", () => {
+          return request(app)
+            .get("/api/users/rosa_lyn")
+            .expect(404)
+            .then((res) => {
+              expect(res.body.msg).toBe("User: rosa_lyn not found :(");
+            });
+        });
+      });
+    });
+    describe("/articles", () => {
+      describe("/:article_id", () => {
+        test.only("GET 200: responds with an article object with necessary properties", () => {
+          return request(app)
+            .get("/api/articles/1")
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article).toHaveProperty("comment_count");
+              expect(res.body.article).toEqual(
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  body: expect.any(String),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  // comment_count: expect.any(Number),
+                })
+              );
+            });
+        });
       });
     });
   });
