@@ -68,7 +68,6 @@ describe("app", () => {
             .get("/api/articles/1")
             .expect(200)
             .then((res) => {
-              expect(res.body.article).toHaveProperty("comment_count");
               expect(res.body.article).toEqual(
                 expect.objectContaining({
                   author: expect.any(String),
@@ -78,12 +77,12 @@ describe("app", () => {
                   topic: expect.any(String),
                   created_at: expect.any(String),
                   votes: expect.any(Number),
-                  // comment_count: expect.any(Number),
+                  comment_count: expect.any(Number),
                 })
               );
             });
         });
-        test.only("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+        test("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
           return request(app)
             .get("/api/articles/Moustache")
             .expect(400)

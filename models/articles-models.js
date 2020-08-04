@@ -9,7 +9,8 @@ exports.getArticlesByArticleId = (articleId) => {
     .groupBy("articles.article_id")
     .where("articles.article_id", articleId)
     .then((articleRows) => {
-      // console.log(articleRows);
+      const commentCount = Number(articleRows[0].comment_count);
+      articleRows[0].comment_count = commentCount;
       return articleRows[0];
     });
 };
