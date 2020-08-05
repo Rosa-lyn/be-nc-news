@@ -160,6 +160,45 @@ describe("app", () => {
               );
             });
         });
+        describe("/comments", () => {
+          test("POST 201: adds a comment to an article and responds with the posted comment", () => {
+            return request(app)
+              .post("/api/articles/7/comments")
+              .send({ username: "icellusedkars", body: "I am still hungry" })
+              .expect(201)
+              .then((res) => {
+                expect(res.body.comment).toEqual(
+                  expect.objectContaining({
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                  })
+                );
+              });
+          });
+          test("POST 404: responds 'article not found' when given an article id that doesn't exist", () => {
+            return request(app)
+              .post("/api/articles/123456/comments")
+              .send({ username: "icellusedkars", body: "I am still hungry" })
+              .expect(404)
+              .then((res) => {
+                expect(res.body.msg).toEqual("Article: 123456 not found :(");
+              });
+          });
+          test.only("POST 400: responds 'invalid article id' when passed an article id with the wrong datatype", () => {
+            return request(app)
+              .post("/api/articles/A/comments")
+              .send({ username: "butter_bridge", body: "I love cats" })
+              .expect(400)
+              .then((res) => {
+                expect(res.body.msg).toEqual(
+                  "Invalid article id: A :( Article id must be a number"
+                );
+              });
+          });
+        });
       });
     });
   });

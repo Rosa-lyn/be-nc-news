@@ -42,3 +42,26 @@ exports.patchArticleByArticleId = (articleId, incVotes) => {
       return articleRows[0];
     });
 };
+
+exports.postCommentToArticle = (username, body, articleId) => {
+  // console.log(articleId);
+  return knex
+    .select("*")
+    .from("articles")
+    .where("article_id", articleId)
+    .then((articleRows) => {
+      if (articleRows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article: ${articleId} not found :(`,
+        });
+      } else
+        return knex
+          .insert({ author: username, article_id: articleId, body })
+          .into("comments")
+          .returning(["comment_id", "votes", "created_at", "author", "body"])
+          .then((commentRows) => {
+            return commentRows[0];
+          });
+    });
+};
