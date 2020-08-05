@@ -10,7 +10,17 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02") {
-    const id = req.url.substring(14);
-    res.status(400).send({ msg: `Invalid article id: ${id} :(` });
+    let id = req.url.substring(14);
+    id = id.replace(/%20/g, " ");
+
+    if (req.body.inc_votes && typeof req.body.inc_votes !== "number") {
+      res.status(400).send({
+        msg: "Invalid request body :( inc_votes value must be a number",
+      });
+    } else {
+      res.status(400).send({
+        msg: `Invalid article id: ${id} :( Article id must be a number`,
+      });
+    }
   } else console.log(err);
 };

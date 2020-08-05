@@ -87,7 +87,9 @@ describe("app", () => {
             .get("/api/articles/Moustache")
             .expect(400)
             .then((res) => {
-              expect(res.body.msg).toEqual("Invalid article id: Moustache :(");
+              expect(res.body.msg).toEqual(
+                "Invalid article id: Moustache :( Article id must be a number"
+              );
             });
         });
         test("GET 404: responds with 'article not found' when given an article id that doesn't exist", () => {
@@ -96,6 +98,66 @@ describe("app", () => {
             .expect(404)
             .then((res) => {
               expect(res.body.msg).toEqual("Article: 4000000 not found :(");
+            });
+        });
+        test("PATCH 200: updates number of votes on article for positive value and responds with updated article", () => {
+          return request(app)
+            .patch("/api/articles/2")
+            .send({ inc_votes: 10 })
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article.votes).toEqual(10);
+            });
+        });
+        test("PATCH 200: updates number of votes on article for negative value and responds with updated article", () => {
+          return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: -50 })
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article.votes).toEqual(50);
+            });
+        });
+        test("PATCH 404: responds with 'article not found' when given an article id that doesn't exist", () => {
+          return request(app)
+            .patch("/api/articles/4000000")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Article: 4000000 not found :(");
+            });
+        });
+        test("PATCH 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+          return request(app)
+            .patch("/api/articles/Am I a cat?")
+            .send({ inc_votes: 20 })
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual(
+                "Invalid article id: Am I a cat? :( Article id must be a number"
+              );
+            });
+        });
+        test("PATCH 400: responds with 'missing required fields' when given a malformed request body", () => {
+          return request(app)
+            .patch("/api/articles/5")
+            .send({})
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual(
+                "Missing required fields on request body :( Body must be in the form { inc_votes: newVote }"
+              );
+            });
+        });
+        test("PATCH 400: responds with 'invalid body' when given an inc_votes value with the wrong datatype", () => {
+          return request(app)
+            .patch("/api/articles/6")
+            .send({ inc_votes: "ten" })
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual(
+                "Invalid request body :( inc_votes value must be a number"
+              );
             });
         });
       });

@@ -7,6 +7,8 @@ const {
   handlePSQLErrors,
 } = require("./errors");
 
+app.use(express.json());
+
 app.use("/api", apiRouter);
 app.all("/*", handleInvalidPaths);
 
