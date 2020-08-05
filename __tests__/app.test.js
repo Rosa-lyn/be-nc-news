@@ -216,6 +216,14 @@ describe("app", () => {
                 );
               });
           });
+          test("GET 404: responds with 'article not found' when given an article id that doesn't exist", () => {
+            return request(app)
+              .get("/api/articles/8765432/comments")
+              .expect(404)
+              .then((res) => {
+                expect(res.body.msg).toEqual("Article: 8765432 not found :(");
+              });
+          });
           test("GET 200: comments are sorted in descending order by 'created_at' column by default", () => {
             return request(app)
               .get("/api/articles/1/comments")
@@ -244,6 +252,46 @@ describe("app", () => {
                 expect(res.body.comments).toBeSortedBy("created_at", {
                   descending: false,
                 });
+              });
+          });
+          test("GET 200: accepts multiple queries at once", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort_by=author&order=asc")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments).toBeSortedBy("author", {
+                  descending: false,
+                });
+              });
+          });
+          test("GET 200: ignores queries that aren't allowed", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort=author")
+              .then((res) => {
+                expect(res.body.comments).toEqual(
+                  expect.arrayContaining([
+                    expect.objectContaining({
+                      comment_id: expect.any(Number),
+                      votes: expect.any(Number),
+                      created_at: expect.any(String),
+                      author: expect.any(String),
+                      body: expect.any(String),
+                    }),
+                  ])
+                );
+                expect(res.body.comments).toBeSortedBy("created_at", {
+                  descending: true,
+                });
+              });
+          });
+          test("GET 400: responds with 'invalid sort query' when given a sort column that doesn't exist", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort_by=username")
+              .expect(400)
+              .then((res) => {
+                expect(res.body.msg).toEqual(
+                  "Invalid sort query :( Please enter a valid sort_by value"
+                );
               });
           });
         });

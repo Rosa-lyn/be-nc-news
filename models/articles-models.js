@@ -71,9 +71,18 @@ exports.getCommentsByArticleId = (
   sortBy = "created_at",
   order = "desc"
 ) => {
+  // console.log(sortBy);
   return knex
     .select("comment_id", "votes", "created_at", "author", "body")
     .from("comments")
     .where("article_id", articleId)
-    .orderBy(sortBy, order);
+    .orderBy(sortBy, order)
+    .then((commentRows) => {
+      if (commentRows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article: ${articleId} not found :(`,
+        });
+      } else return commentRows;
+    });
 };

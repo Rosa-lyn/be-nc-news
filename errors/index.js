@@ -23,5 +23,11 @@ exports.handlePSQLErrors = (err, req, res, next) => {
         msg: `Invalid article id: ${id} :( Article id must be a number`,
       });
     }
+  } else if (err.code === "42703") {
+    res
+      .status(400)
+      .send({
+        msg: "Invalid sort query :( Please enter a valid sort_by value",
+      });
   } else console.log(err);
 };
