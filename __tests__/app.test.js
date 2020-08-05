@@ -187,7 +187,7 @@ describe("app", () => {
                 expect(res.body.msg).toEqual("Article: 123456 not found :(");
               });
           });
-          test.only("POST 400: responds 'invalid article id' when passed an article id with the wrong datatype", () => {
+          xtest("POST 400: responds 'invalid article id' when passed an article id with the wrong datatype", () => {
             return request(app)
               .post("/api/articles/A/comments")
               .send({ username: "butter_bridge", body: "I love cats" })
@@ -196,6 +196,54 @@ describe("app", () => {
                 expect(res.body.msg).toEqual(
                   "Invalid article id: A :( Article id must be a number"
                 );
+              });
+          });
+          test("GET 200: responds with an array of comments for the given article id with necessary properties", () => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments).toEqual(
+                  expect.arrayContaining([
+                    expect.objectContaining({
+                      comment_id: expect.any(Number),
+                      votes: expect.any(Number),
+                      created_at: expect.any(String),
+                      author: expect.any(String),
+                      body: expect.any(String),
+                    }),
+                  ])
+                );
+              });
+          });
+          test("GET 200: comments are sorted in descending order by 'created_at' column by default", () => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments).toBeSortedBy("created_at", {
+                  descending: true,
+                });
+              });
+          });
+          test("GET 200: accepts a 'sort_by' query and sorts comments by given column", () => {
+            return request(app)
+              .get("/api/articles/1/comments?sort_by=votes")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments).toBeSortedBy("votes", {
+                  descending: true,
+                });
+              });
+          });
+          test("GET 200: accepts an 'order' query and sets the sort order to ascending or descending", () => {
+            return request(app)
+              .get("/api/articles/1/comments?order=asc")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments).toBeSortedBy("created_at", {
+                  descending: false,
+                });
               });
           });
         });

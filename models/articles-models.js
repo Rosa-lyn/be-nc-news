@@ -65,3 +65,15 @@ exports.postCommentToArticle = (username, body, articleId) => {
           });
     });
 };
+
+exports.getCommentsByArticleId = (
+  articleId,
+  sortBy = "created_at",
+  order = "desc"
+) => {
+  return knex
+    .select("comment_id", "votes", "created_at", "author", "body")
+    .from("comments")
+    .where("article_id", articleId)
+    .orderBy(sortBy, order);
+};
