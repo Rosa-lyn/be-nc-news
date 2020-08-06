@@ -82,14 +82,12 @@ describe("app", () => {
               );
             });
         });
-        test("GET 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+        test("GET 400: responds with 'invalid id' when given an article id with the wrong datatype", () => {
           return request(app)
             .get("/api/articles/Moustache")
             .expect(400)
             .then((res) => {
-              expect(res.body.msg).toEqual(
-                "Invalid article id: Moustache :( Article id must be a number"
-              );
+              expect(res.body.msg).toEqual("Invalid id :(");
             });
         });
         test("GET 404: responds with 'article not found' when given an article id that doesn't exist", () => {
@@ -118,6 +116,26 @@ describe("app", () => {
               expect(res.body.article.votes).toEqual(50);
             });
         });
+        test("PATCH 200: inc_votes defaults to 0 when given a malformed body", () => {
+          return request(app)
+            .patch("/api/articles/5")
+            .send({})
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article).toEqual(
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  body: expect.any(String),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: 0,
+                  // comment_count: expect.any(Number),
+                })
+              );
+            });
+        });
         test("PATCH 404: responds with 'article not found' when given an article id that doesn't exist", () => {
           return request(app)
             .patch("/api/articles/4000000")
@@ -127,37 +145,13 @@ describe("app", () => {
               expect(res.body.msg).toEqual("Article: 4000000 not found :(");
             });
         });
-        test("PATCH 400: responds with 'invalid article id' when given an article id with the wrong datatype", () => {
+        test("PATCH 400: responds with 'invalid id' when given an article id with the wrong datatype", () => {
           return request(app)
             .patch("/api/articles/Am I a cat?")
             .send({ inc_votes: 20 })
             .expect(400)
             .then((res) => {
-              expect(res.body.msg).toEqual(
-                "Invalid article id: Am I a cat? :( Article id must be a number"
-              );
-            });
-        });
-        test("PATCH 400: responds with 'missing required fields' when given a malformed request body", () => {
-          return request(app)
-            .patch("/api/articles/5")
-            .send({})
-            .expect(400)
-            .then((res) => {
-              expect(res.body.msg).toEqual(
-                "Missing required fields on request body :( Body must be in the form { inc_votes: newVote }"
-              );
-            });
-        });
-        test("PATCH 400: responds with 'invalid body' when given an inc_votes value with the wrong datatype", () => {
-          return request(app)
-            .patch("/api/articles/6")
-            .send({ inc_votes: "ten" })
-            .expect(400)
-            .then((res) => {
-              expect(res.body.msg).toEqual(
-                "Invalid request body :( inc_votes value must be a number"
-              );
+              expect(res.body.msg).toEqual("Invalid id :(");
             });
         });
         describe("/comments", () => {
@@ -187,15 +181,13 @@ describe("app", () => {
                 expect(res.body.msg).toEqual("Article: 123456 not found :(");
               });
           });
-          xtest("POST 400: responds 'invalid article id' when passed an article id with the wrong datatype", () => {
+          test("POST 400: responds 'invalid id' when passed an article id with the wrong datatype", () => {
             return request(app)
               .post("/api/articles/A/comments")
               .send({ username: "butter_bridge", body: "I love cats" })
               .expect(400)
               .then((res) => {
-                expect(res.body.msg).toEqual(
-                  "Invalid article id: A :( Article id must be a number"
-                );
+                expect(res.body.msg).toEqual("Invalid id :(");
               });
           });
           test("GET 200: responds with an array of comments for the given article id with necessary properties", () => {
@@ -289,9 +281,7 @@ describe("app", () => {
               .get("/api/articles/1/comments?sort_by=username")
               .expect(400)
               .then((res) => {
-                expect(res.body.msg).toEqual(
-                  "Invalid sort query :( Please enter a valid sort_by value"
-                );
+                expect(res.body.msg).toEqual("Invalid sort query :(");
               });
           });
         });
@@ -337,6 +327,14 @@ describe("app", () => {
             });
           });
       });
+      test("GET 400: responds with 'invalid sort query' when given a sort column that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?sort_by=slug")
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toEqual("Invalid sort query :(");
+          });
+      });
       test("GET 200: accepts an 'order' query and orders articles by the given order, 'asc' or 'desc'", () => {
         return request(app)
           .get("/api/articles?order=asc")
@@ -358,6 +356,22 @@ describe("app", () => {
             });
           });
       });
+      test("GET 200: responds with an empty array if given a valid 'author' value but there aren't any articles by that author", () => {
+        return request(app)
+          .get("/api/articles?author=lurker")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(0);
+          });
+      });
+      test("GET 404: responds 'author not found' when given an author that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?author=rosa_lyn")
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toBe("User: rosa_lyn not found :(");
+          });
+      });
       test("GET 200: accepts a 'topic' query, which filters the articles by the topic value", () => {
         return request(app)
           .get("/api/articles?topic=cats")
@@ -367,6 +381,22 @@ describe("app", () => {
             res.body.articles.forEach((article) => {
               expect(article.topic).toBe("cats");
             });
+          });
+      });
+      test("GET 200: responds with an empty array if given a valid 'topic' value but there aren't any articles with that topic", () => {
+        return request(app)
+          .get("/api/articles?topic=paper")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(0);
+          });
+      });
+      test("GET 404: responds 'topic not found' when given a topic that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?topic=bumblebees")
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toEqual("Topic: bumblebees not found :(");
           });
       });
       test("GET 200: accepts multiple queries at once", () => {
@@ -385,6 +415,103 @@ describe("app", () => {
               expect(article.author).toBe("icellusedkars");
             });
           });
+      });
+      test("GET 200: ignores queries that aren't allowed", () => {
+        return request(app)
+          .get("/api/articles?hello=true")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(Number),
+                }),
+              ])
+            );
+          });
+      });
+    });
+    describe("/comments", () => {
+      describe("/:comment_id", () => {
+        test("PATCH 200: updates number of votes on comment for positive value and responds with updated comment", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: 4 })
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  author: expect.any(String),
+                  article_id: expect.any(Number),
+                  votes: 20,
+                  created_at: expect.any(String),
+                  body: expect.any(String),
+                })
+              );
+            });
+        });
+        test("PATCH 200: updates number of votes on comment for negative value and responds with updated comment", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: -4 })
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  author: expect.any(String),
+                  article_id: expect.any(Number),
+                  votes: 12,
+                  created_at: expect.any(String),
+                  body: expect.any(String),
+                })
+              );
+            });
+        });
+        test("PATCH 200: number of votes defaults to 0 if given a malformed body", () => {
+          return request(app)
+            .patch("/api/comments/4")
+            .send({})
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  author: expect.any(String),
+                  article_id: expect.any(Number),
+                  votes: -100,
+                  created_at: expect.any(String),
+                  body: expect.any(String),
+                })
+              );
+            });
+        });
+        test("PATCH 404: responds 'comment not found' when given a valid but non-existent comment_id", () => {
+          return request(app)
+            .patch("/api/comments/20000")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Comment not found :(");
+            });
+        });
+        test("PATCH 400: responds 'invalid id' when given an id with the wrong datatype", () => {
+          return request(app)
+            .patch("/api/comments/my_comment")
+            .send({ inc_votes: 3 })
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Invalid id :(");
+            });
+        });
       });
     });
   });

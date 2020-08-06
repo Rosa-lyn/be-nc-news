@@ -6,6 +6,10 @@ const {
   getArticles,
 } = require("../models/articles-models");
 
+const { getUserByUsername } = require("../models/users-models");
+
+const { getTopicBySlug } = require("../models/topics-models");
+
 exports.sendArticleByArticleId = (req, res, next) => {
   const { article_id: articleId } = req.params;
   getArticleByArticleId(articleId)
@@ -47,7 +51,14 @@ exports.sendCommentsByArticleId = (req, res, next) => {
 
 exports.sendArticles = (req, res, next) => {
   const { sort_by: sortBy, order, author, topic } = req.query;
-  getArticles(sortBy, order, author, topic).then((articles) => {
-    res.send({ articles });
-  });
+
+  const models = [getArticles(sortBy, order, author, topic)];
+  if (author) models.push(getUserByUsername(author));
+  if (topic) models.push(getTopicBySlug(topic));
+
+  Promise.all(models)
+    .then(([articles]) => {
+      res.send({ articles });
+    })
+    .catch(next);
 };

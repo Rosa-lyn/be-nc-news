@@ -22,18 +22,13 @@ exports.getArticleByArticleId = (articleId) => {
 };
 
 exports.patchArticleByArticleId = (articleId, incVotes) => {
-  if (incVotes === undefined) {
-    return Promise.reject({
-      status: 400,
-      msg:
-        "Missing required fields on request body :( Body must be in the form { inc_votes: newVote }",
-    });
-  }
+  if (incVotes === undefined) incVotes = 0;
   return knex("articles")
     .increment("votes", incVotes)
     .where("article_id", articleId)
     .returning("*")
     .then((articleRows) => {
+      console.log(articleRows);
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
@@ -45,7 +40,6 @@ exports.patchArticleByArticleId = (articleId, incVotes) => {
 };
 
 exports.postCommentToArticle = (username, body, articleId) => {
-  // console.log(articleId);
   return knex
     .select("*")
     .from("articles")

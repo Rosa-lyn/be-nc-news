@@ -10,24 +10,12 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02") {
-    // console.log(req);
-    let id = req.url.substring(14);
-    id = id.replace(/%20/g, " ");
-
-    if (req.body.inc_votes && typeof req.body.inc_votes !== "number") {
-      res.status(400).send({
-        msg: "Invalid request body :( inc_votes value must be a number",
-      });
-    } else {
-      res.status(400).send({
-        msg: `Invalid article id: ${id} :( Article id must be a number`,
-      });
-    }
+    res.status(400).send({
+      msg: "Invalid id :(",
+    });
   } else if (err.code === "42703") {
-    res
-      .status(400)
-      .send({
-        msg: "Invalid sort query :( Please enter a valid sort_by value",
-      });
+    res.status(400).send({
+      msg: "Invalid sort query :(",
+    });
   } else console.log(err);
 };
