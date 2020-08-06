@@ -3,6 +3,7 @@ const {
   patchArticleByArticleId,
   postCommentToArticle,
   getCommentsByArticleId,
+  getArticles,
 } = require("../models/articles-models");
 
 exports.sendArticleByArticleId = (req, res, next) => {
@@ -39,8 +40,14 @@ exports.sendCommentsByArticleId = (req, res, next) => {
   const { sort_by: sortBy, order } = req.query;
   getCommentsByArticleId(articleId, sortBy, order)
     .then((comments) => {
-      console.log({ comments });
       res.send({ comments });
     })
     .catch(next);
+};
+
+exports.sendArticles = (req, res, next) => {
+  const { sort_by: sortBy, order, author, topic } = req.query;
+  getArticles(sortBy, order, author, topic).then((articles) => {
+    res.send({ articles });
+  });
 };

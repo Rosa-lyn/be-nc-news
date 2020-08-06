@@ -4,6 +4,7 @@ const {
   updateArticleByArticleId,
   addCommentToArticle,
   sendCommentsByArticleId,
+  sendArticles,
 } = require("../controllers/articles-controllers");
 
 articlesRouter
@@ -15,5 +16,7 @@ articlesRouter
   .route("/:article_id/comments")
   .post(addCommentToArticle)
   .get(sendCommentsByArticleId);
+
+articlesRouter.route("/").get(sendArticles);
 
 module.exports = articlesRouter;

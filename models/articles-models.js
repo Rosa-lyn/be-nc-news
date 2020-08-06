@@ -20,6 +20,7 @@ exports.getArticleByArticleId = (articleId) => {
       return articleRows[0];
     });
 };
+
 exports.patchArticleByArticleId = (articleId, incVotes) => {
   if (incVotes === undefined) {
     return Promise.reject({
@@ -71,7 +72,6 @@ exports.getCommentsByArticleId = (
   sortBy = "created_at",
   order = "desc"
 ) => {
-  // console.log(sortBy);
   return knex
     .select("comment_id", "votes", "created_at", "author", "body")
     .from("comments")
@@ -84,5 +84,37 @@ exports.getCommentsByArticleId = (
           msg: `Article: ${articleId} not found :(`,
         });
       } else return commentRows;
+    });
+};
+
+exports.getArticles = (
+  sortBy = "created_at",
+  order = "desc",
+  author,
+  topic
+) => {
+  return knex
+    .select(
+      "articles.author",
+      "articles.title",
+      "articles.article_id",
+      "articles.topic",
+      "articles.created_at",
+      "articles.votes"
+    )
+    .from("articles")
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sortBy, order)
+    .modify((query) => {
+      if (author) query.where("articles.author", author);
+      if (topic) query.where("articles.topic", topic);
+    })
+    .then((articleRows) => {
+      articleRows.forEach((article) => {
+        article.comment_count = Number(article.comment_count);
+      });
+      return articleRows;
     });
 };

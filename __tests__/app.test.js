@@ -296,6 +296,96 @@ describe("app", () => {
           });
         });
       });
+      test("GET 200: responds with all articles in an array with necessary properties", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(Number),
+                }),
+              ])
+            );
+          });
+      });
+      test("GET 200: articles are sorted descending by created_at date by default", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+      test("GET 200: accepts a 'sort_by' query and sorts articles by the given column", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("author", {
+              descending: true,
+            });
+          });
+      });
+      test("GET 200: accepts an 'order' query and orders articles by the given order, 'asc' or 'desc'", () => {
+        return request(app)
+          .get("/api/articles?order=asc")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("created_at", {
+              descending: false,
+            });
+          });
+      });
+      test("GET 200: accepts an 'author' query, which filters the articles by the username value", () => {
+        return request(app)
+          .get("/api/articles?author=butter_bridge")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(3);
+            res.body.articles.forEach((article) => {
+              expect(article.author).toBe("butter_bridge");
+            });
+          });
+      });
+      test("GET 200: accepts a 'topic' query, which filters the articles by the topic value", () => {
+        return request(app)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(1);
+            res.body.articles.forEach((article) => {
+              expect(article.topic).toBe("cats");
+            });
+          });
+      });
+      test("GET 200: accepts multiple queries at once", () => {
+        return request(app)
+          .get(
+            "/api/articles?sort_by=title&order=desc&author=icellusedkars&topic=mitch"
+          )
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(6);
+            expect(res.body.articles).toBeSortedBy("title", {
+              descending: true,
+            });
+            res.body.articles.forEach((article) => {
+              expect(article.topic).toBe("mitch");
+              expect(article.author).toBe("icellusedkars");
+            });
+          });
+      });
     });
   });
 });
