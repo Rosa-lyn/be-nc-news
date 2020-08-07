@@ -18,6 +18,27 @@ describe("app", () => {
     });
   });
   describe("/api", () => {
+    test("GET 200: responds with all the endpoints available on the API", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.endpoints).toEqual(
+            expect.objectContaining({
+              "GET /api": expect.any(Object),
+              "GET /api/topics": expect.any(Object),
+              "GET /api/users/:username": expect.any(Object),
+              "GET /api/articles/:article_id": expect.any(Object),
+              "PATCH /api/articles/:article_id": expect.any(Object),
+              "POST /api/articles/:article_id/comments": expect.any(Object),
+              "GET /api/articles/:article_id/comments": expect.any(Object),
+              "GET /api/articles": expect.any(Object),
+              "PATCH /api/comments/:comment_id": expect.any(Object),
+              "DELETE /api/comments/:comment_id": expect.any(Object),
+            })
+          );
+        });
+    });
     describe("/topics", () => {
       test("INVALID METHODS 405: responds 'method not allowed' when a delete or patch request is made", () => {
         const invalidMethods = ["delete", "patch"];
