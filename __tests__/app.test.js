@@ -426,6 +426,15 @@ describe("app", () => {
                 expect(res.body.msg).toEqual("Invalid id :(");
               });
           });
+          test("POST 400: responds 'bad request' when given a malformed request body", () => {
+            return request(app)
+              .post("/api/articles/1/comments")
+              .send({})
+              .expect(400)
+              .then((res) => {
+                expect(res.body.msg).toEqual("Bad request :(");
+              });
+          });
           test("GET 200: responds with an array of comments for the given article id with necessary properties", () => {
             return request(app)
               .get("/api/articles/1/comments")
