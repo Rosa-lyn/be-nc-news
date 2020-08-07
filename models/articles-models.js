@@ -28,7 +28,6 @@ exports.patchArticleByArticleId = (articleId, incVotes) => {
     .where("article_id", articleId)
     .returning("*")
     .then((articleRows) => {
-      console.log(articleRows);
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,

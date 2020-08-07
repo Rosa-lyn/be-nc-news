@@ -1,6 +1,7 @@
 const topicsRouter = require("express").Router();
 const { sendTopics } = require("../controllers/topics-controllers");
+const { handleInvalidMethods } = require("../errors");
 
-topicsRouter.route("/").get(sendTopics);
+topicsRouter.route("/").get(sendTopics).all(handleInvalidMethods);
 
 module.exports = topicsRouter;

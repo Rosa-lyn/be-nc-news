@@ -6,17 +6,20 @@ const {
   sendCommentsByArticleId,
   sendArticles,
 } = require("../controllers/articles-controllers");
+const { handleInvalidMethods } = require("../errors");
 
 articlesRouter
   .route("/:article_id")
   .get(sendArticleByArticleId)
-  .patch(updateArticleByArticleId);
+  .patch(updateArticleByArticleId)
+  .post(handleInvalidMethods);
 
 articlesRouter
   .route("/:article_id/comments")
   .post(addCommentToArticle)
-  .get(sendCommentsByArticleId);
+  .get(sendCommentsByArticleId)
+  .all(handleInvalidMethods);
 
-articlesRouter.route("/").get(sendArticles);
+articlesRouter.route("/").get(sendArticles).all(handleInvalidMethods);
 
 module.exports = articlesRouter;

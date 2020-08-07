@@ -19,6 +19,18 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("/topics", () => {
+      test("INVALID METHODS 405: responds 'method not allowed' when a delete or patch request is made", () => {
+        const invalidMethods = ["delete", "patch"];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]("/api/topics")
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       test("GET 200: responds with an array of topic objects with necessary properties", () => {
         return request(app)
           .get("/api/topics")
@@ -37,6 +49,14 @@ describe("app", () => {
     });
     describe("/users", () => {
       describe("/:username", () => {
+        test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
+          return request(app)
+            .post(`/api/users/${String}`)
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
         test("GET 200: responds with a user object with necessary properties", () => {
           return request(app)
             .get("/api/users/butter_bridge")
@@ -63,6 +83,14 @@ describe("app", () => {
     });
     describe("/articles", () => {
       describe("/:article_id", () => {
+        test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
+          return request(app)
+            .post(`/api/articles/${Number}`)
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
         test("GET 200: responds with an article object with necessary properties", () => {
           return request(app)
             .get("/api/articles/1")
@@ -155,6 +183,18 @@ describe("app", () => {
             });
         });
         describe("/comments", () => {
+          test("INVALID METHODS 405: responds 'method not allowed' when a delete or patch request is made", () => {
+            const invalidMethods = ["delete", "patch"];
+            const methodPromises = invalidMethods.map((method) => {
+              return request(app)
+                [method](`/api/articles/${Number}/comments`)
+                .expect(405)
+                .then((res) => {
+                  expect(res.body.msg).toEqual("Method not allowed :(");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
           test("POST 201: adds a comment to an article and responds with the posted comment", () => {
             return request(app)
               .post("/api/articles/7/comments")
@@ -285,6 +325,18 @@ describe("app", () => {
               });
           });
         });
+      });
+      test("INVALID METHODS 405: responds 'method not allowed' when a delete or patch request is made", () => {
+        const invalidMethods = ["delete", "patch"];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]("/api/articles")
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
+        return Promise.all(methodPromises);
       });
       test("GET 200: responds with all articles in an array with necessary properties", () => {
         return request(app)
@@ -440,6 +492,14 @@ describe("app", () => {
     });
     describe("/comments", () => {
       describe("/:comment_id", () => {
+        test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
+          return request(app)
+            .post(`/api/comments/${Number}`)
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
         test("PATCH 200: updates number of votes on comment for positive value and responds with updated comment", () => {
           return request(app)
             .patch("/api/comments/1")
