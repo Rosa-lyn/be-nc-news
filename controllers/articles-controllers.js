@@ -42,8 +42,14 @@ exports.addCommentToArticle = (req, res, next) => {
 exports.sendCommentsByArticleId = (req, res, next) => {
   const { article_id: articleId } = req.params;
   const { sort_by: sortBy, order } = req.query;
-  getCommentsByArticleId(articleId, sortBy, order)
-    .then((comments) => {
+
+  const models = [
+    getCommentsByArticleId(articleId, sortBy, order),
+    getArticleByArticleId(articleId),
+  ];
+
+  Promise.all(models)
+    .then(([comments]) => {
       res.send({ comments });
     })
     .catch(next);

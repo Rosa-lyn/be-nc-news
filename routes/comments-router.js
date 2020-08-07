@@ -9,6 +9,6 @@ commentsRouter
   .route("/:comment_id")
   .patch(updateCommentByCommentId)
   .delete(removeCommentByCommentId)
-  .post(handleInvalidMethods);
+  .all(handleInvalidMethods);
 
 module.exports = commentsRouter;

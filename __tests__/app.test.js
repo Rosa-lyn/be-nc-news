@@ -18,6 +18,14 @@ describe("app", () => {
     });
   });
   describe("/api", () => {
+    test("INVALID METHODS 405: responds 'method not allowed' when a delete request is made", () => {
+      return request(app)
+        .delete("/api")
+        .expect(405)
+        .then((res) => {
+          expect(res.body.msg).toEqual("Method not allowed :(");
+        });
+    });
     test("GET 200: responds with all the endpoints available on the API", () => {
       return request(app)
         .get("/api")
@@ -70,13 +78,17 @@ describe("app", () => {
     });
     describe("/users", () => {
       describe("/:username", () => {
-        test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
-          return request(app)
-            .post(`/api/users/${String}`)
-            .expect(405)
-            .then((res) => {
-              expect(res.body.msg).toEqual("Method not allowed :(");
-            });
+        test("INVALID METHODS 405: responds 'method not allowed' when a post or put request is made", () => {
+          const invalidMethods = ["post", "put"];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)
+              [method](`/api/users/${String}`)
+              .expect(405)
+              .then((res) => {
+                expect(res.body.msg).toEqual("Method not allowed :(");
+              });
+          });
+          return Promise.all(methodPromises);
         });
         test("GET 200: responds with a user object with necessary properties", () => {
           return request(app)
@@ -103,6 +115,169 @@ describe("app", () => {
       });
     });
     describe("/articles", () => {
+      test("INVALID METHODS 405: responds 'method not allowed' when a delete, patch or put request is made", () => {
+        const invalidMethods = ["delete", "patch", "put"];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]("/api/articles")
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Method not allowed :(");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+      test("GET 200: responds with all articles in an array with necessary properties", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(Number),
+                }),
+              ])
+            );
+          });
+      });
+      test("GET 200: articles are sorted descending by created_at date by default", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+      test("GET 200: accepts a 'sort_by' query and sorts articles by the given column", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("author", {
+              descending: true,
+            });
+          });
+      });
+      test("GET 400: responds with 'invalid sort query' when given a sort column that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?sort_by=slug")
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toEqual("Invalid sort query :(");
+          });
+      });
+      test("GET 200: accepts an 'order' query and orders articles by the given order, 'asc' or 'desc'", () => {
+        return request(app)
+          .get("/api/articles?order=asc")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).toBeSortedBy("created_at", {
+              descending: false,
+            });
+          });
+      });
+      test("GET 200: accepts an 'author' query, which filters the articles by the username value", () => {
+        return request(app)
+          .get("/api/articles?author=butter_bridge")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(3);
+            res.body.articles.forEach((article) => {
+              expect(article.author).toBe("butter_bridge");
+            });
+          });
+      });
+      test("GET 200: responds with an empty array if given a valid 'author' value but there aren't any articles by that author", () => {
+        return request(app)
+          .get("/api/articles?author=lurker")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(0);
+          });
+      });
+      test("GET 404: responds 'author not found' when given an author that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?author=rosa_lyn")
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toBe("User not found :(");
+          });
+      });
+      test("GET 200: accepts a 'topic' query, which filters the articles by the topic value", () => {
+        return request(app)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(1);
+            res.body.articles.forEach((article) => {
+              expect(article.topic).toBe("cats");
+            });
+          });
+      });
+      test("GET 200: responds with an empty array if given a valid 'topic' value but there aren't any articles with that topic", () => {
+        return request(app)
+          .get("/api/articles?topic=paper")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(0);
+          });
+      });
+      test("GET 404: responds 'topic not found' when given a topic that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?topic=bumblebees")
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toEqual("Topic not found :(");
+          });
+      });
+      test("GET 200: accepts multiple queries at once", () => {
+        return request(app)
+          .get(
+            "/api/articles?sort_by=title&order=desc&author=icellusedkars&topic=mitch"
+          )
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(6);
+            expect(res.body.articles).toBeSortedBy("title", {
+              descending: true,
+            });
+            res.body.articles.forEach((article) => {
+              expect(article.topic).toBe("mitch");
+              expect(article.author).toBe("icellusedkars");
+            });
+          });
+      });
+      test("GET 200: ignores queries that aren't allowed", () => {
+        return request(app)
+          .get("/api/articles?hello=true")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(Number),
+                }),
+              ])
+            );
+          });
+      });
       describe("/:article_id", () => {
         test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
           return request(app)
@@ -269,6 +444,14 @@ describe("app", () => {
                 );
               });
           });
+          test("GET 200: responds with an empty array if the given article doesn't have any comments", () => {
+            return request(app)
+              .get("/api/articles/2/comments")
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comments.length).toBe(0);
+              });
+          });
           test("GET 404: responds with 'article not found' when given an article id that doesn't exist", () => {
             return request(app)
               .get("/api/articles/8765432/comments")
@@ -347,179 +530,20 @@ describe("app", () => {
           });
         });
       });
-      test("INVALID METHODS 405: responds 'method not allowed' when a delete or patch request is made", () => {
-        const invalidMethods = ["delete", "patch"];
-        const methodPromises = invalidMethods.map((method) => {
-          return request(app)
-            [method]("/api/articles")
-            .expect(405)
-            .then((res) => {
-              expect(res.body.msg).toEqual("Method not allowed :(");
-            });
-        });
-        return Promise.all(methodPromises);
-      });
-      test("GET 200: responds with all articles in an array with necessary properties", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(12);
-            expect(res.body.articles).toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({
-                  author: expect.any(String),
-                  title: expect.any(String),
-                  article_id: expect.any(Number),
-                  topic: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  comment_count: expect.any(Number),
-                }),
-              ])
-            );
-          });
-      });
-      test("GET 200: articles are sorted descending by created_at date by default", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles).toBeSortedBy("created_at", {
-              descending: true,
-            });
-          });
-      });
-      test("GET 200: accepts a 'sort_by' query and sorts articles by the given column", () => {
-        return request(app)
-          .get("/api/articles?sort_by=author")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles).toBeSortedBy("author", {
-              descending: true,
-            });
-          });
-      });
-      test("GET 400: responds with 'invalid sort query' when given a sort column that doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?sort_by=slug")
-          .expect(400)
-          .then((res) => {
-            expect(res.body.msg).toEqual("Invalid sort query :(");
-          });
-      });
-      test("GET 200: accepts an 'order' query and orders articles by the given order, 'asc' or 'desc'", () => {
-        return request(app)
-          .get("/api/articles?order=asc")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles).toBeSortedBy("created_at", {
-              descending: false,
-            });
-          });
-      });
-      test("GET 200: accepts an 'author' query, which filters the articles by the username value", () => {
-        return request(app)
-          .get("/api/articles?author=butter_bridge")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(3);
-            res.body.articles.forEach((article) => {
-              expect(article.author).toBe("butter_bridge");
-            });
-          });
-      });
-      test("GET 200: responds with an empty array if given a valid 'author' value but there aren't any articles by that author", () => {
-        return request(app)
-          .get("/api/articles?author=lurker")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(0);
-          });
-      });
-      test("GET 404: responds 'author not found' when given an author that doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?author=rosa_lyn")
-          .expect(404)
-          .then((res) => {
-            expect(res.body.msg).toBe("User not found :(");
-          });
-      });
-      test("GET 200: accepts a 'topic' query, which filters the articles by the topic value", () => {
-        return request(app)
-          .get("/api/articles?topic=cats")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(1);
-            res.body.articles.forEach((article) => {
-              expect(article.topic).toBe("cats");
-            });
-          });
-      });
-      test("GET 200: responds with an empty array if given a valid 'topic' value but there aren't any articles with that topic", () => {
-        return request(app)
-          .get("/api/articles?topic=paper")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(0);
-          });
-      });
-      test("GET 404: responds 'topic not found' when given a topic that doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?topic=bumblebees")
-          .expect(404)
-          .then((res) => {
-            expect(res.body.msg).toEqual("Topic not found :(");
-          });
-      });
-      test("GET 200: accepts multiple queries at once", () => {
-        return request(app)
-          .get(
-            "/api/articles?sort_by=title&order=desc&author=icellusedkars&topic=mitch"
-          )
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(6);
-            expect(res.body.articles).toBeSortedBy("title", {
-              descending: true,
-            });
-            res.body.articles.forEach((article) => {
-              expect(article.topic).toBe("mitch");
-              expect(article.author).toBe("icellusedkars");
-            });
-          });
-      });
-      test("GET 200: ignores queries that aren't allowed", () => {
-        return request(app)
-          .get("/api/articles?hello=true")
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles.length).toBe(12);
-            expect(res.body.articles).toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({
-                  author: expect.any(String),
-                  title: expect.any(String),
-                  article_id: expect.any(Number),
-                  topic: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  comment_count: expect.any(Number),
-                }),
-              ])
-            );
-          });
-      });
     });
     describe("/comments", () => {
       describe("/:comment_id", () => {
-        test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
-          return request(app)
-            .post(`/api/comments/${Number}`)
-            .expect(405)
-            .then((res) => {
-              expect(res.body.msg).toEqual("Method not allowed :(");
-            });
+        test("INVALID METHODS 405: responds 'method not allowed' when a post or put request is made", () => {
+          const invalidMethods = ["post", "put"];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)
+              [method](`/api/comments/${Number}`)
+              .expect(405)
+              .then((res) => {
+                expect(res.body.msg).toEqual("Method not allowed :(");
+              });
+          });
+          return Promise.all(methodPromises);
         });
         test("PATCH 200: updates number of votes on comment for positive value and responds with updated comment", () => {
           return request(app)

@@ -12,7 +12,7 @@ articlesRouter
   .route("/:article_id")
   .get(sendArticleByArticleId)
   .patch(updateArticleByArticleId)
-  .post(handleInvalidMethods);
+  .all(handleInvalidMethods);
 
 articlesRouter
   .route("/:article_id/comments")

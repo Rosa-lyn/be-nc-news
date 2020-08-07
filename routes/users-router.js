@@ -5,6 +5,6 @@ const { handleInvalidMethods } = require("../errors");
 usersRouter
   .route("/:username")
   .get(sendUserByUsername)
-  .post(handleInvalidMethods);
+  .all(handleInvalidMethods);
 
 module.exports = usersRouter;
