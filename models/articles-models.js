@@ -1,4 +1,5 @@
 const knex = require("../db/connection");
+const { offset } = require("../db/connection");
 
 exports.getArticleByArticleId = (articleId) => {
   return knex
@@ -78,9 +79,10 @@ exports.getArticles = (
   order = "desc",
   author,
   topic,
-  limit = 10
+  limit = 10,
+  page = 1
 ) => {
-  console.log(limit);
+  const offsetValue = (page - 1) * limit;
   return knex
     .select(
       "articles.author",
@@ -100,6 +102,7 @@ exports.getArticles = (
       if (topic) query.where("articles.topic", topic);
     })
     .limit(limit)
+    .offset(offsetValue)
     .then((articleRows) => {
       articleRows.forEach((article) => {
         article.comment_count = Number(article.comment_count);

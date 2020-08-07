@@ -294,6 +294,33 @@ describe("app", () => {
             expect(res.body.articles.length).toBe(5);
           });
       });
+      test("GET 200: accepts a 'p' (page) query and displays articles only on that page", () => {
+        return request(app)
+          .get("/api/articles?limit=5&p=2")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(5);
+            expect(res.body.articles[0].article_id).toBe(6);
+          });
+      });
+      test("GET 200: accepts a 'p' (page) query and displays articles only on that page when the number of articles on the page is less than the limit value", () => {
+        return request(app)
+          .get("/api/articles?limit=5&p=3")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(2);
+            expect(res.body.articles[0].article_id).toBe(11);
+          });
+      });
+      test("GET 200: displays page 1 by default if no 'p' value is given", () => {
+        return request(app)
+          .get("/api/articles?limit=5")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(5);
+            expect(res.body.articles[0].article_id).toBe(1);
+          });
+      });
       describe("/:article_id", () => {
         test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
           return request(app)
