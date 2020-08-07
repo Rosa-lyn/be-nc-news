@@ -512,6 +512,38 @@ describe("app", () => {
               expect(res.body.msg).toEqual("Invalid id :(");
             });
         });
+        test("DELETE 204: deletes the given comment", () => {
+          return request(app)
+            .delete("/api/comments/1")
+            .expect(204)
+            .then(() => {
+              return request(app)
+                .get("/api/articles/9/comments")
+                .expect(200)
+                .then((res) => {
+                  expect(res.body.comments.length).toBe(1);
+                  res.body.comments.forEach((comment) => {
+                    expect(comment.comment_id).not.toBe(1);
+                  });
+                });
+            });
+        });
+        test("DELETE 404: responds 'comment not found' when given a comment id that doesn't exist", () => {
+          return request(app)
+            .delete("/api/comments/20000")
+            .expect(404)
+            .then((res) => {
+              expect(res.body.msg).toBe("Comment not found :(");
+            });
+        });
+        test("DELETE 400: responds 'invalid id' when given a comment id with the wrong datatype", () => {
+          return request(app)
+            .delete("/api/comments/my_comment")
+            .expect(400)
+            .then((res) => {
+              expect(res.body.msg).toEqual("Invalid id :(");
+            });
+        });
       });
     });
   });
