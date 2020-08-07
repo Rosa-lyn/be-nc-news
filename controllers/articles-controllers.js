@@ -56,9 +56,9 @@ exports.sendCommentsByArticleId = (req, res, next) => {
 };
 
 exports.sendArticles = (req, res, next) => {
-  const { sort_by: sortBy, order, author, topic } = req.query;
+  const { sort_by: sortBy, order, author, topic, limit } = req.query;
 
-  const models = [getArticles(sortBy, order, author, topic)];
+  const models = [getArticles(sortBy, order, author, topic, limit)];
   if (author) models.push(getUserByUsername(author));
   if (topic) models.push(getTopicBySlug(topic));
 

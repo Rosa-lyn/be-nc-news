@@ -132,7 +132,7 @@ describe("app", () => {
           .get("/api/articles")
           .expect(200)
           .then((res) => {
-            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles.length).toBe(10);
             expect(res.body.articles).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({
@@ -262,7 +262,7 @@ describe("app", () => {
           .get("/api/articles?hello=true")
           .expect(200)
           .then((res) => {
-            expect(res.body.articles.length).toBe(12);
+            expect(res.body.articles.length).toBe(10);
             expect(res.body.articles).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({
@@ -276,6 +276,22 @@ describe("app", () => {
                 }),
               ])
             );
+          });
+      });
+      test("GET 200: responds with a maximum of 10 articles by default", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(10);
+          });
+      });
+      test("GET 200: accepts a 'limit' query and limits the number of responses to the given limit value", () => {
+        return request(app)
+          .get("/api/articles?limit=5")
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles.length).toBe(5);
           });
       });
       describe("/:article_id", () => {

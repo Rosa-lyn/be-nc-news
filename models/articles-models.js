@@ -77,8 +77,10 @@ exports.getArticles = (
   sortBy = "created_at",
   order = "desc",
   author,
-  topic
+  topic,
+  limit = 10
 ) => {
+  console.log(limit);
   return knex
     .select(
       "articles.author",
@@ -97,6 +99,7 @@ exports.getArticles = (
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles.topic", topic);
     })
+    .limit(limit)
     .then((articleRows) => {
       articleRows.forEach((article) => {
         article.comment_count = Number(article.comment_count);

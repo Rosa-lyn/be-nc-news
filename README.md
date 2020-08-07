@@ -186,7 +186,7 @@ npm test utils
 
 ## Author
 
-Rosalyn Land | [Portfolio](https://rosa-lyn.github.io/)| [GitHub](https://github.com/Rosa-lyn) | [LinkedIn](https://linkedin.com/in/rosalynland)
+Rosalyn Land | [Portfolio](https://rosa-lyn.github.io/) | [GitHub](https://github.com/Rosa-lyn) | [LinkedIn](https://linkedin.com/in/rosalynland)
 
 ## Acknowledgements
 
