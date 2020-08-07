@@ -15,11 +15,17 @@ const customConfig = {
   development: {
     connection: {
       database: "northcoders_news",
+      // for linux users:
+      // username: 'your-username-here',
+      // password: 'your-password-here'
     },
   },
   test: {
     connection: {
       database: "northcoders_news_test",
+      // for linux users:
+      // username: 'your-username-here',
+      // password: 'your-password-here'
     },
   },
   production: {
