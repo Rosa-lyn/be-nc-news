@@ -76,7 +76,7 @@ describe("app", () => {
             .get("/api/users/rosa_lyn")
             .expect(404)
             .then((res) => {
-              expect(res.body.msg).toBe("User: rosa_lyn not found :(");
+              expect(res.body.msg).toBe("User not found :(");
             });
         });
       });
@@ -123,7 +123,7 @@ describe("app", () => {
             .get("/api/articles/4000000")
             .expect(404)
             .then((res) => {
-              expect(res.body.msg).toEqual("Article: 4000000 not found :(");
+              expect(res.body.msg).toEqual("Article not found :(");
             });
         });
         test("PATCH 200: updates number of votes on article for positive value and responds with updated article", () => {
@@ -170,7 +170,7 @@ describe("app", () => {
             .send({ inc_votes: 5 })
             .expect(404)
             .then((res) => {
-              expect(res.body.msg).toEqual("Article: 4000000 not found :(");
+              expect(res.body.msg).toEqual("Article not found :(");
             });
         });
         test("PATCH 400: responds with 'invalid id' when given an article id with the wrong datatype", () => {
@@ -218,7 +218,7 @@ describe("app", () => {
               .send({ username: "icellusedkars", body: "I am still hungry" })
               .expect(404)
               .then((res) => {
-                expect(res.body.msg).toEqual("Article: 123456 not found :(");
+                expect(res.body.msg).toEqual("Article not found :(");
               });
           });
           test("POST 400: responds 'invalid id' when passed an article id with the wrong datatype", () => {
@@ -253,7 +253,7 @@ describe("app", () => {
               .get("/api/articles/8765432/comments")
               .expect(404)
               .then((res) => {
-                expect(res.body.msg).toEqual("Article: 8765432 not found :(");
+                expect(res.body.msg).toEqual("Article not found :(");
               });
           });
           test("GET 200: comments are sorted in descending order by 'created_at' column by default", () => {
@@ -421,7 +421,7 @@ describe("app", () => {
           .get("/api/articles?author=rosa_lyn")
           .expect(404)
           .then((res) => {
-            expect(res.body.msg).toBe("User: rosa_lyn not found :(");
+            expect(res.body.msg).toBe("User not found :(");
           });
       });
       test("GET 200: accepts a 'topic' query, which filters the articles by the topic value", () => {
@@ -448,7 +448,7 @@ describe("app", () => {
           .get("/api/articles?topic=bumblebees")
           .expect(404)
           .then((res) => {
-            expect(res.body.msg).toEqual("Topic: bumblebees not found :(");
+            expect(res.body.msg).toEqual("Topic not found :(");
           });
       });
       test("GET 200: accepts multiple queries at once", () => {

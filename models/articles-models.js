@@ -12,7 +12,7 @@ exports.getArticleByArticleId = (articleId) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article: ${articleId} not found :(`,
+          msg: "Article not found :(",
         });
       }
       const commentCount = Number(articleRows[0].comment_count);
@@ -31,7 +31,7 @@ exports.patchArticleByArticleId = (articleId, incVotes) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article: ${articleId} not found :(`,
+          msg: "Article not found :(",
         });
       }
       return articleRows[0];
@@ -47,7 +47,7 @@ exports.postCommentToArticle = (username, body, articleId) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article: ${articleId} not found :(`,
+          msg: "Article not found :(",
         });
       } else
         return knex
@@ -74,7 +74,7 @@ exports.getCommentsByArticleId = (
       if (commentRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article: ${articleId} not found :(`,
+          msg: "Article not found :(",
         });
       } else return commentRows;
     });

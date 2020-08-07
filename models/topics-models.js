@@ -13,7 +13,7 @@ exports.getTopicBySlug = (slug) => {
       if (topicRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Topic: ${slug} not found :(`,
+          msg: "Topic not found :(",
         });
       } else return topicRows[0];
     });
