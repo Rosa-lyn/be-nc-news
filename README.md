@@ -46,7 +46,7 @@ Supertest v4.0.2
 
 The minimum version requirement is stated next to each dependency.
 
-### Creating and Seeding Databases
+### Creating the Databases
 
 There are two databases for this project - `northcoders_news` for development and `northcoders_news_test` for testing. To set these up, run the following script:
 
@@ -54,25 +54,7 @@ There are two databases for this project - `northcoders_news` for development an
 npm run setup-dbs
 ```
 
-To set up the tables in the databases, run:
-
-```
-npm run migrate-make
-```
-
-There are two scripts to seed the databases with data. To seed `northcoders_news_test` with the test data, run:
-
-```
-npm run seed-test
-```
-
-To seed `northcoders_news` with development data, run:
-
-```
-npm run seed
-```
-
-### Connecting to the databases
+### Connecting to the Databases
 
 To connect to the databases, you will need to create a file in the root directory of the project called `knexfile.js`. Copy the following into the file, ensuring to add your Linux username and password if you are a Linux user:
 
@@ -122,7 +104,21 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 You will notice that `knexfile.js` has already been `.gitignore`d to keep your configuration details secure.
 
-### Previewing the app
+### Seeding the Databases
+
+There are two scripts to seed the databases with data. To seed `northcoders_news_test` with the test data, run:
+
+```
+npm run seed-test
+```
+
+To seed `northcoders_news` with development data, run:
+
+```
+npm run seed
+```
+
+### Previewing the App
 
 To check the app is working in your browser or a REST client such as [Insomnia](https://insomnia.rest/), run the following script to start the server:
 
