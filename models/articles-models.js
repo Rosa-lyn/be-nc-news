@@ -82,7 +82,7 @@ exports.getArticles = (
   limit = 10,
   page = 1
 ) => {
-  const offsetValue = (page - 1) * limit;
+  const offset = (page - 1) * limit;
   return knex
     .select(
       "articles.author",
@@ -102,7 +102,7 @@ exports.getArticles = (
       if (topic) query.where("articles.topic", topic);
     })
     .limit(limit)
-    .offset(offsetValue)
+    .offset(offset)
     .then((articleRows) => {
       articleRows.forEach((article) => {
         article.comment_count = Number(article.comment_count);
