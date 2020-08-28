@@ -56,53 +56,9 @@ npm run setup-dbs
 
 ### Connecting to the Databases
 
-To connect to the databases, you will need to create a file in the root directory of the project called `knexfile.js`. Copy the following into the file, ensuring to add your Linux username and password if you are a Linux user:
+If you are a Mac user, you should have no issues connecting to the databases.
 
-```
-const ENV = process.env.NODE_ENV || "development";
-const { DB_URL } = process.env;
-
-const baseConfig = {
-  client: "pg",
-  migrations: {
-    directory: "./db/migrations",
-  },
-  seeds: {
-    directory: "./db/seeds",
-  },
-};
-
-const customConfig = {
-  development: {
-    connection: {
-      database: "northcoders_news",
-      // for linux users:
-      // username: 'your-username-here',
-      // password: 'your-password-here'
-    },
-  },
-  test: {
-    connection: {
-      database: "northcoders_news_test",
-      // for linux users:
-      // username: 'your-username-here',
-      // password: 'your-password-here'
-    },
-  },
-  production: {
-    connection: {
-      connectionString: DB_URL,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    },
-  },
-};
-
-module.exports = { ...customConfig[ENV], ...baseConfig };
-```
-
-You will notice that `knexfile.js` has already been `.gitignore`d to keep your configuration details secure.
+However, if you are a Linux user, your username and password must be added to the `customConfig` object inside `knexfile.js`. To keep your credentials secure, create a new javascript file where you should save your Linux username and password as variables. **Make sure to add this file to the `.gitignore`.** Then export your username and password variables into `knexfile.js` and add them to the `customConfig` object.
 
 ### Seeding the Databases
 
