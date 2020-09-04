@@ -333,6 +333,19 @@ describe("app", () => {
             );
           });
       });
+      test("GET 200: the 'total_count' property shows the total number of articles when filters are applied", () => {
+        return request(app)
+          .get("/api/articles?author=icellusedkars&limit=3")
+          .expect(200)
+          .then((res) => {
+            expect(res.body).toEqual(
+              expect.objectContaining({
+                total_count: expect.any(Number),
+              })
+            );
+            expect(res.body.articles.length).toBe(3);
+          });
+      });
       describe("/:article_id", () => {
         test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
           return request(app)

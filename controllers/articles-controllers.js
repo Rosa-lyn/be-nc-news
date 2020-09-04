@@ -61,7 +61,7 @@ exports.sendArticles = (req, res, next) => {
 
   const models = [
     getArticles(sortBy, order, author, topic, limit, page),
-    countArticles(),
+    countArticles(sortBy, order, author, topic),
   ];
   if (author) models.push(getUserByUsername(author));
   if (topic) models.push(getTopicBySlug(topic));

@@ -109,7 +109,12 @@ exports.getArticles = (
       return articleRows;
     });
 };
-exports.countArticles = () => {
+exports.countArticles = (
+  sortBy = "created_at",
+  order = "desc",
+  author,
+  topic
+) => {
   return knex
     .select(
       "articles.author",
@@ -120,6 +125,11 @@ exports.countArticles = () => {
       "articles.votes"
     )
     .from("articles")
+    .orderBy(sortBy, order)
+    .modify((query) => {
+      if (author) query.where("articles.author", author);
+      if (topic) query.where("articles.topic", topic);
+    })
     .then((articleRows) => {
       return articleRows.length;
     });
