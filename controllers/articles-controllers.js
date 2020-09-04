@@ -4,6 +4,7 @@ const {
   postCommentToArticle,
   getCommentsByArticleId,
   getArticles,
+  countArticles,
 } = require("../models/articles-models");
 
 const { getUserByUsername } = require("../models/users-models");
@@ -58,13 +59,18 @@ exports.sendCommentsByArticleId = (req, res, next) => {
 exports.sendArticles = (req, res, next) => {
   const { sort_by: sortBy, order, author, topic, limit, p: page } = req.query;
 
-  const models = [getArticles(sortBy, order, author, topic, limit, page)];
+  const models = [
+    getArticles(sortBy, order, author, topic, limit, page),
+    countArticles(),
+  ];
   if (author) models.push(getUserByUsername(author));
   if (topic) models.push(getTopicBySlug(topic));
 
   Promise.all(models)
-    .then(([articles]) => {
-      res.send({ articles });
+    .then((resolvedPromises) => {
+      const articles = resolvedPromises[0];
+      const total_count = resolvedPromises[1];
+      res.send({ total_count, articles });
     })
     .catch(next);
 };

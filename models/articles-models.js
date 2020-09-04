@@ -18,7 +18,6 @@ exports.getArticleByArticleId = (articleId) => {
       }
       const commentCount = Number(articleRows[0].comment_count);
       articleRows[0].comment_count = commentCount;
-      // console.log(articleRows[0]);
       return articleRows[0];
     });
 };
@@ -108,5 +107,20 @@ exports.getArticles = (
         article.comment_count = Number(article.comment_count);
       });
       return articleRows;
+    });
+};
+exports.countArticles = () => {
+  return knex
+    .select(
+      "articles.author",
+      "articles.title",
+      "articles.article_id",
+      "articles.topic",
+      "articles.created_at",
+      "articles.votes"
+    )
+    .from("articles")
+    .then((articleRows) => {
+      return articleRows.length;
     });
 };
