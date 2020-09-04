@@ -42,10 +42,10 @@ exports.addCommentToArticle = (req, res, next) => {
 
 exports.sendCommentsByArticleId = (req, res, next) => {
   const { article_id: articleId } = req.params;
-  const { sort_by: sortBy, order } = req.query;
+  const { sort_by, order } = req.query;
 
   const models = [
-    getCommentsByArticleId(articleId, sortBy, order),
+    getCommentsByArticleId(articleId, sort_by, order),
     getArticleByArticleId(articleId),
   ];
 
@@ -57,11 +57,10 @@ exports.sendCommentsByArticleId = (req, res, next) => {
 };
 
 exports.sendArticles = (req, res, next) => {
-  const { sort_by: sortBy, order, author, topic, limit, p: page } = req.query;
-
+  const { sort_by, order, author, topic, limit, p } = req.query;
   const models = [
-    getArticles(sortBy, order, author, topic, limit, page),
-    countArticles(sortBy, order, author, topic),
+    getArticles(sort_by, order, author, topic, limit, p),
+    countArticles(sort_by, order, author, topic),
   ];
   if (author) models.push(getUserByUsername(author));
   if (topic) models.push(getTopicBySlug(topic));
@@ -70,7 +69,10 @@ exports.sendArticles = (req, res, next) => {
     .then((resolvedPromises) => {
       const articles = resolvedPromises[0];
       const total_count = resolvedPromises[1];
-      res.send({ total_count, articles });
+      res.send({
+        total_count,
+        articles,
+      });
     })
     .catch(next);
 };

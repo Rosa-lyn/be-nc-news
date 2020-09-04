@@ -346,6 +346,29 @@ describe("app", () => {
             expect(res.body.articles.length).toBe(3);
           });
       });
+      test("GET 200: sorts by comment_count", () => {
+        return request(app)
+          .get("/api/articles?sort_by=comment_count")
+          .expect(200)
+          .then((res) => {
+            expect(res.body).toEqual(
+              expect.objectContaining({
+                total_count: expect.any(Number),
+                articles: expect.arrayContaining([
+                  expect.objectContaining({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number),
+                  }),
+                ]),
+              })
+            );
+          });
+      });
       describe("/:article_id", () => {
         test("INVALID METHODS 405: responds 'method not allowed' when a post request is made", () => {
           return request(app)

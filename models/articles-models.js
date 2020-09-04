@@ -1,5 +1,5 @@
 const knex = require("../db/connection");
-const { offset } = require("../db/connection");
+// const { offset } = require("../db/connection");
 
 exports.getArticleByArticleId = (articleId) => {
   return knex
@@ -39,7 +39,6 @@ exports.patchArticleByArticleId = (articleId, incVotes = 0) => {
 };
 
 exports.postCommentToArticle = (username, body, articleId) => {
-  console.log(articleId);
   return knex
     .select("*")
     .from("articles")
@@ -63,25 +62,25 @@ exports.postCommentToArticle = (username, body, articleId) => {
 
 exports.getCommentsByArticleId = (
   articleId,
-  sortBy = "created_at",
+  sort_by = "created_at",
   order = "desc"
 ) => {
   return knex
     .select("comment_id", "votes", "created_at", "author", "body")
     .from("comments")
     .where("article_id", articleId)
-    .orderBy(sortBy, order);
+    .orderBy(sort_by, order);
 };
 
 exports.getArticles = (
-  sortBy = "created_at",
+  sort_by = "created_at",
   order = "desc",
   author,
   topic,
   limit = 10,
-  page = 1
+  p = 1
 ) => {
-  const offset = (page - 1) * limit;
+  const offset = (p - 1) * limit;
   return knex
     .select(
       "articles.author",
@@ -95,7 +94,7 @@ exports.getArticles = (
     .count({ comment_count: "comment_id" })
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
-    .orderBy(sortBy, order)
+    .orderBy(sort_by, order)
     .modify((query) => {
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles.topic", topic);
@@ -110,7 +109,7 @@ exports.getArticles = (
     });
 };
 exports.countArticles = (
-  sortBy = "created_at",
+  sort_by = "created_at",
   order = "desc",
   author,
   topic
@@ -125,7 +124,10 @@ exports.countArticles = (
       "articles.votes"
     )
     .from("articles")
-    .orderBy(sortBy, order)
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by, order)
     .modify((query) => {
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles.topic", topic);
