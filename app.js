@@ -8,20 +8,7 @@ const {
   handlePSQLErrors,
 } = require("./errors");
 
-var whitelist = ["http://localhost:3000", "https://thenewsden.netlify.app"];
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 
