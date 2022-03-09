@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "jest": "^26.2.2",
-    "jest-sorted": "^1.0.6",
+    "jest-sorted": "^1.0.14",
     "supertest": "^4.0.2"
   }
 }
